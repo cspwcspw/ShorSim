@@ -92,6 +92,9 @@ public class HelpersTests
     [InlineData(3044, 3.14159, 10000)]
     [InlineData(24239, 3.14159, 100000)]
     [InlineData(5, 0.8, 100)]
+    [InlineData(2, 0.5, 100)]      // I saw this misbehave, telling me in Shor.c that the rational approx
+    [InlineData(2, 0.49999, 100)]  // of 0.5 was 1/1.   But I can't reproduce it and stupidly don't know
+    [InlineData(2, 0.50001, 100)]  // what x or n was
     public void denominator(int expected, double frac, int qmax)
     {
         int denom = Utils.denominator(frac, qmax);

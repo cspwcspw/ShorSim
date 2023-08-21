@@ -292,7 +292,7 @@ any of the above numbers, or determining that they are prime.
                 // If we measured zero, we have gained no new information about the period, we must try again.
                 if (m == 0)
                 {
-                    Console.WriteLine($"Reg1 measured 0, but that can't help us find a period. This trial (when x={x}) fails !");
+                    Console.WriteLine($"Reg1 measured 0, but that can't help us find a period. This trial (when x={x}) fails.");
                     continue;
                 }
 
@@ -315,7 +315,7 @@ any of the above numbers, or determining that they are prime.
                 Console.WriteLine($"Measured m (peak index after DFT) = {m}, of q={q} possible positions.");
                 Console.WriteLine($"The rational approximation for m/q = {c} is: {p}/{den}. ");
 
-                // The denominator is our period, and an odd period is not useful as a result of Shor's algorithm.
+                // The denominator is our period, and an odd period is not useful in what follows.
                 // If the denominator times two is still less than q we can use that.
                 if (den % 2 == 1 && 2 * den < q)
                 {
@@ -328,10 +328,10 @@ any of the above numbers, or determining that they are prime.
                 a = b = 0;
                 factor = 0;
 
-                // Failed if odd denominator.
+                // Failed if odd denominator.  // todo - why can't we double this fraction?
                 if (den % 2 == 1)
                 {
-                    Console.WriteLine($"   Odd period found. This trial (when x={x}) fails.");
+                    Console.WriteLine($"   Odd period found, too big to double. This trial (when x={x}) fails.");
                     continue;
                 }
                 if (den == 2)  // it is too small, and will pass a zero to GCD - double it.
@@ -344,25 +344,29 @@ any of the above numbers, or determining that they are prime.
 
                 //Calculate candidates for possible common factors with n.
                 Console.WriteLine($"   Candidate period is {den}");
-                a = SimUtils.modexp(x + 1, (den / 2), n);      
-                b = SimUtils.modexp(x - 1, (den / 2), n);
-
+                int halfDen = den / 2;
+                a = SimUtils.modexp(x + 1, halfDen, n);      
+                b = SimUtils.modexp(x - 1, halfDen, n);
+                Console.Write($" ModExp({x+1},{halfDen},{n})={a},  ModExp({x-1},{halfDen},{n})={b};  ");
 
                 if (a == 0 || b == 0)
                 {
-                    Console.WriteLine($"   a={a} and b={b}: Our pick for x={x} is leads to a zero which cannot work.  Trying again.");
+                    Console.WriteLine($"Our pick for x={x} is leads to a zero which cannot work.  Trying again.");
                     continue;
                 }
 
-                factor = (int)Math.Max(SimUtils.GCD(n, a), SimUtils.GCD(n, b));
+                int g1 = SimUtils.GCD(n, a);
+                int g2 = SimUtils.GCD(n, b);
+                Console.Write($" GCD({n},{a})={g1}, GCD({n},{b})={g2}. ");
+                factor = (int)Math.Max(g1, g2);
 
 
                 if ((factor == n || factor == 1))
                 {
-                    Console.WriteLine($"   Found trivial factors 1 and {n}.  Trying again.");
+                    Console.WriteLine($" Found trivial factors 1 and {n}.  Trying again.");
                     continue;
                 }
-
+                Console.WriteLine();
                 //If nothing else has gone wrong, and we got a factor we are
                 //finished.  Otherwise start over.
                 if (factor != 0)

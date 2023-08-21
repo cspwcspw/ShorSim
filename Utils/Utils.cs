@@ -5,7 +5,7 @@ using Num = System.Int32;  // Future use.  change this if you need to  Int64, or
 namespace Helpers;
 
 
- 
+
 
 public static class Utils
 {
@@ -13,19 +13,19 @@ public static class Utils
 
     public static BitArray SmallPrimes { get; private set; }  // populated in the static constructor class
 
-    static Utils() 
+    static Utils()
     {
         int N = 10000;
         SmallPrimes = new BitArray(N);
         SmallPrimes.SetAll(true);
         SmallPrimes[0] = false;
         SmallPrimes[1] = false;
-        int upperBound = (int) Math.Ceiling(Math.Sqrt(N));
+        int upperBound = (int)Math.Ceiling(Math.Sqrt(N));
         // Sieve out values that are not prime
-        for (int p=2; p <= upperBound; p++)  // p is prime, eliminate all its multiples
+        for (int p = 2; p <= upperBound; p++)  // p is prime, eliminate all its multiples
         {
-            int lastMultiple = (N-1) / p;
-            for (int q=2; q <= lastMultiple; q++)
+            int lastMultiple = (N - 1) / p;
+            for (int q = 2; q <= lastMultiple; q++)
             {
                 SmallPrimes[p * q] = false;
             }
@@ -103,20 +103,60 @@ public static class Utils
     //an error code if we ever would try to take the modulus of something and
     //zero.
 
-    // Pete thinks, let the caller beware. I'm happy to have it crash when b == 0 
-
-    public static int GCD(int aInitial, int bInitial)
+    static public int GCD(int a, int b)
     {
-        int a = aInitial;
-        int b = bInitial;
-        while (a % b != 0)
+
+        // GCD(0, b) == b; GCD(a, 0) == a,
+        // GCD(0, 0) == 0
+        if (a == 0)
+            return b;
+        if (b == 0)
+            return a;
+
+        // Finding K, where K is the greatest
+        // power of 2 that divides both a and b
+        int k;
+        for (k = 0; ((a | b) & 1) == 0; ++k)   
         {
-            int d = a % b;
-            a = b;
-            b = d;
+            a >>= 1;
+            b >>= 1;
         }
-        return b;
+
+        // Dividing a by 2 until a becomes odd
+        while ((a & 1) == 0)
+        {
+            a >>= 1;
+        }
+
+        // From here on, 'a' is always odd
+        do
+        {
+            // If b is even, remove
+            // all factor of 2 in b
+            while ((b & 1) == 0)
+            {
+                b >>= 1;
+            }
+
+            /* Now a and b are both odd. Swap
+            if necessary so a <= b, then set
+            b = b - a (which is even).*/
+            if (a > b)
+            {
+
+                // Swap u and v.
+                int temp = a;
+                a = b;
+                b = temp;
+            }
+
+            b = (b - a);
+        } while (b != 0);
+
+        /* restore common factors of 2 */
+        return a << k;
     }
+
 
     // This function takes and integer argument, and returns the size in bits
     // needed to represent that integer.
@@ -261,33 +301,30 @@ public static class Utils
     //    reg.Normalize();
     //}
 
-
-    // Pete says, I want a global rng that can be explicitly seeded, so that we can write repeatable
-    // unit tests.  In real life when not testing, we can avoid the explicit seed.
+    //// Pete says, I use a global rng that can be explicitly seeded, so that we can write repeatable
+    //// unit tests.  In real life, when not testing, we'll avoid the explicit seed.
     //public static int PickCoPrime(Random rng, int n)
     //{
     //    int xMax = (int)Math.Sqrt(n) + 1;
     //    int x = 0;
-    //    int ub = 100; // initially try only small two-digit random numbers
 
-    //    int xtries = 0;
+    //    // The binomial expansion theorem expands ((x+n)^i) into x^i and lots of 
+    //    // other terms that all contain powers of n.    Because we're going to 
+    //    // mod powers of x by n, we don't ever have to try x >= n.
+    //    // So Pete is saying "even if you did pick a big x, it would work the
+    //    // same as x%n.   So don't pick it big in the first place. 
+
     //    while (true)
     //    {
-    //        x = rng.Next(3, ub - 1);  // Don't allow x=0, 1 or 2, or x == ub-1
-    //        int g = (int)SimUtils.GCD(n, x);
+    //        x = rng.Next(3, n - 1);  // Don't allow x=0, 1 or 2, or x == n-1
+    //        int g = (int)Utils.GCD(n, x);
     //        Console.Write($"gcd({n},{x})={g}; ");
     //        if (g == 1)
     //        {
-    //            Console.WriteLine($"Yay! We'll use magic x to be {x}");
+    //            Console.WriteLine($"Yay, found co-prime to try, x={x}");
     //            break;
     //        }
 
-    //        // We'd like small x, but if we can't find small ones, try a bigger range of random numbers
-    //        if (++xtries % 10 == 0)
-    //        {
-    //            ub *= 10;
-    //            ub = Math.Min(ub, (int)n);
-    //        }
     //    }
     //    return x;
     //}

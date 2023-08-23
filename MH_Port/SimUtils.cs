@@ -206,7 +206,9 @@ public class SimUtils
         int q1 = 1;
         int q2 = 0;
 
-        double eps = 0.5 / (qmax * qmax);
+        double eps = 0.5 / ((double)qmax * (double)qmax);
+        // Pete wants to try a much more lenient eps to find poentially smaller denominators
+        eps = 0.005 / (double)qmax;
         while (true)
         {
             z = y - Math.Floor(y);

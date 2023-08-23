@@ -345,9 +345,11 @@ any of the above numbers, or determining that they are prime.
                 //Calculate candidates for possible common factors with n.
                 Console.WriteLine($"   Candidate period is {den}");
                 int halfDen = den / 2;
-                a = SimUtils.modexp(x + 1, halfDen, n);      
-                b = SimUtils.modexp(x - 1, halfDen, n);
-                Console.Write($" ModExp({x+1},{halfDen},{n})={a},  ModExp({x-1},{halfDen},{n})={b};  ");
+                int v = SimUtils.modexp(x, halfDen, n);
+                a = (v + 1) % n;
+                b = (v - 1) % n;
+
+                Console.Write($" ModExp({x},{halfDen},{n})={v}, so a={a}, b={b};  ");
 
                 if (a == 0 || b == 0)
                 {

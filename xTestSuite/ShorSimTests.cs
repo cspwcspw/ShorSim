@@ -89,7 +89,11 @@ public class MatthewHayward
     [InlineData(5, 0.8, 100)]
     [InlineData(2, 0.5, 100)]      // I saw this misbehave, telling me in Shor.c that the rational approx
     [InlineData(2, 0.49999, 100)]  // of 0.5 was 1/1.   But I can't reproduce it and stupidly don't know
-    [InlineData(2, 0.50001, 100)]  // what x or n was
+    [InlineData(2, 0.49999, 10000)]  // what x or n was
+    [InlineData(2, 0.50001, 100)]
+    [InlineData(2, 0.50001, 1000)]
+    [InlineData(2, 0.50001, 10000)]
+    [InlineData(2, 0.50001, 100000)]   // The problem is that the bigger maxq is, the more bizarre the fractions it finds.
     public void denominator(int expected, double frac, int qmax)
     {
         int denom = SimUtils.denominator(frac, qmax);
